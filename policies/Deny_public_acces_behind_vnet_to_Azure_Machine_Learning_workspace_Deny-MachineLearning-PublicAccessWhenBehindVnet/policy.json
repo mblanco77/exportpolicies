@@ -1,0 +1,63 @@
+{
+ "properties": {
+  "displayName": "Deny public acces behind vnet to Azure Machine Learning workspace",
+  "policyType": "Custom",
+  "mode": "Indexed",
+  "description": "Deny public access behind vnet to Azure Machine Learning workspaces.",
+  "metadata": {
+   "version": "1.0.0",
+   "category": "Machine Learning",
+   "source": "https://github.com/Azure/Enterprise-Scale/",
+   "alzCloudEnvironments": [
+    "AzureCloud"
+   ],
+   "createdBy": "6d1c4b40-ad7e-42fd-a2f2-e069c5e7ee8d",
+   "createdOn": "2022-12-15T12:52:03.0035682Z",
+   "updatedBy": null,
+   "updatedOn": null
+  },
+  "parameters": {
+   "effect": {
+    "type": "String",
+    "metadata": {
+     "displayName": "Effect",
+     "description": "Enable or disable the execution of the policy"
+    },
+    "allowedValues": [
+     "Audit",
+     "Disabled",
+     "Deny"
+    ],
+    "defaultValue": "Deny"
+   }
+  },
+  "policyRule": {
+   "if": {
+    "allOf": [
+     {
+      "field": "type",
+      "equals": "Microsoft.MachineLearningServices/workspaces"
+     },
+     {
+      "anyOf": [
+       {
+        "field": "Microsoft.MachineLearningServices/workspaces/allowPublicAccessWhenBehindVnet",
+        "exists": false
+       },
+       {
+        "field": "Microsoft.MachineLearningServices/workspaces/allowPublicAccessWhenBehindVnet",
+        "notEquals": false
+       }
+      ]
+     }
+    ]
+   },
+   "then": {
+    "effect": "[parameters('effect')]"
+   }
+  }
+ },
+ "id": "/providers/Microsoft.Management/managementGroups/alz-mb/providers/Microsoft.Authorization/policyDefinitions/Deny-MachineLearning-PublicAccessWhenBehindVnet",
+ "type": "Microsoft.Authorization/policyDefinitions",
+ "name": "Deny-MachineLearning-PublicAccessWhenBehindVnet"
+}

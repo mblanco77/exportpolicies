@@ -1,0 +1,53 @@
+{
+ "properties": {
+  "displayName": "KeyVault SoftDelete should be enabled",
+  "policyType": "Custom",
+  "mode": "Indexed",
+  "description": "This policy enables you to ensure when a Key Vault is created with out soft delete enabled it will be added.",
+  "metadata": {
+   "version": "1.0.0",
+   "category": "Key Vault",
+   "source": "https://github.com/Azure/Enterprise-Scale/",
+   "alzCloudEnvironments": [
+    "AzureCloud",
+    "AzureChinaCloud",
+    "AzureUSGovernment"
+   ],
+   "createdBy": "6d1c4b40-ad7e-42fd-a2f2-e069c5e7ee8d",
+   "createdOn": "2022-12-15T12:52:02.9447182Z",
+   "updatedBy": null,
+   "updatedOn": null
+  },
+  "parameters": {},
+  "policyRule": {
+   "if": {
+    "anyOf": [
+     {
+      "allOf": [
+       {
+        "field": "type",
+        "equals": "Microsoft.KeyVault/vaults"
+       },
+       {
+        "field": "Microsoft.KeyVault/vaults/enableSoftDelete",
+        "notEquals": true
+       }
+      ]
+     }
+    ]
+   },
+   "then": {
+    "effect": "append",
+    "details": [
+     {
+      "field": "Microsoft.KeyVault/vaults/enableSoftDelete",
+      "value": true
+     }
+    ]
+   }
+  }
+ },
+ "id": "/providers/Microsoft.Management/managementGroups/alz-mb/providers/Microsoft.Authorization/policyDefinitions/Append-KV-SoftDelete",
+ "type": "Microsoft.Authorization/policyDefinitions",
+ "name": "Append-KV-SoftDelete"
+}

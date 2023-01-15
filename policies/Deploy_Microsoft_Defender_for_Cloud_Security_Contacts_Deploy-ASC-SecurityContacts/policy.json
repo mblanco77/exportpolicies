@@ -1,0 +1,149 @@
+{
+ "properties": {
+  "displayName": "Deploy Microsoft Defender for Cloud Security Contacts",
+  "policyType": "Custom",
+  "mode": "All",
+  "description": "Deploy Microsoft Defender for Cloud Security Contacts",
+  "metadata": {
+   "version": "1.0.0",
+   "category": "Security Center",
+   "source": "https://github.com/Azure/Enterprise-Scale/",
+   "alzCloudEnvironments": [
+    "AzureCloud",
+    "AzureChinaCloud",
+    "AzureUSGovernment"
+   ],
+   "createdBy": "6d1c4b40-ad7e-42fd-a2f2-e069c5e7ee8d",
+   "createdOn": "2022-12-15T12:52:03.0772731Z",
+   "updatedBy": null,
+   "updatedOn": null
+  },
+  "parameters": {
+   "emailSecurityContact": {
+    "type": "string",
+    "metadata": {
+     "displayName": "Security contacts email address",
+     "description": "Provide email address for Azure Security Center contact details"
+    }
+   },
+   "effect": {
+    "type": "string",
+    "metadata": {
+     "displayName": "Effect",
+     "description": "Enable or disable the execution of the policy"
+    },
+    "allowedValues": [
+     "DeployIfNotExists",
+     "Disabled"
+    ],
+    "defaultValue": "DeployIfNotExists"
+   },
+   "minimalSeverity": {
+    "type": "string",
+    "metadata": {
+     "displayName": "Minimal severity",
+     "description": "Defines the minimal alert severity which will be sent as email notifications"
+    },
+    "allowedValues": [
+     "High",
+     "Medium",
+     "Low"
+    ],
+    "defaultValue": "High"
+   }
+  },
+  "policyRule": {
+   "if": {
+    "allOf": [
+     {
+      "field": "type",
+      "equals": "Microsoft.Resources/subscriptions"
+     }
+    ]
+   },
+   "then": {
+    "effect": "[parameters('effect')]",
+    "details": {
+     "type": "Microsoft.Security/securityContacts",
+     "deploymentScope": "subscription",
+     "existenceScope": "subscription",
+     "roleDefinitionIds": [
+      "/providers/Microsoft.Authorization/roleDefinitions/fb1c8493-542b-48eb-b624-b4c8fea62acd"
+     ],
+     "existenceCondition": {
+      "allOf": [
+       {
+        "field": "Microsoft.Security/securityContacts/email",
+        "contains": "[parameters('emailSecurityContact')]"
+       },
+       {
+        "field": "Microsoft.Security/securityContacts/alertNotifications.minimalSeverity",
+        "contains": "[parameters('minimalSeverity')]"
+       },
+       {
+        "field": "type",
+        "equals": "Microsoft.Security/securityContacts"
+       },
+       {
+        "field": "Microsoft.Security/securityContacts/alertNotifications",
+        "equals": "On"
+       },
+       {
+        "field": "Microsoft.Security/securityContacts/alertsToAdmins",
+        "equals": "On"
+       }
+      ]
+     },
+     "deployment": {
+      "location": "eastus",
+      "properties": {
+       "mode": "incremental",
+       "parameters": {
+        "emailSecurityContact": {
+         "value": "[parameters('emailSecurityContact')]"
+        }
+       },
+       "template": {
+        "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+        "contentVersion": "1.0.0.0",
+        "parameters": {
+         "emailSecurityContact": {
+          "type": "string",
+          "metadata": {
+           "description": "Security contacts email address"
+          }
+         }
+        },
+        "variables": {},
+        "resources": [
+         {
+          "type": "Microsoft.Security/securityContacts",
+          "name": "default",
+          "apiVersion": "2020-01-01-preview",
+          "properties": {
+           "emails": "[parameters('emailSecurityContact')]",
+           "notificationsByRole": {
+            "state": "On",
+            "roles": [
+             "Owner"
+            ]
+           },
+           "alertNotifications": {
+            "state": "On",
+            "minimalSeverity": "[parameters('minimalSeverity')]"
+           }
+          }
+         }
+        ],
+        "outputs": {}
+       }
+      }
+     }
+    }
+   }
+  }
+ },
+ "id": "/providers/Microsoft.Management/managementGroups/alz-mb/providers/Microsoft.Authorization/policyDefinitions/Deploy-ASC-SecurityContacts",
+ "type": "Microsoft.Authorization/policyDefinitions",
+ "name": "Deploy-ASC-SecurityContacts"
+}
